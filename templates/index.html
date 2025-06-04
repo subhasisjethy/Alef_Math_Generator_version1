@@ -1,0 +1,786 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alef Math Content Decoder – Demo</title>
+
+  <!-- Tailwind & 3rd-party assets -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+
+  <!-- MathJax (unchanged) -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.min.js"
+    id="MathJax-script"
+    async
+  ></script>
+
+  <!-- Lucide font-face + custom overrides -->
+  <style>
+    @font-face {
+      font-family: "LucideIcons";
+      src: url("https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf")
+        format("truetype");
+    }
+    .lucide {
+      font-family: "LucideIcons";
+      line-height: 1;
+    }
+
+    /* ==== Hero section enhancements ==== */
+    .gradient-title {
+      @apply bg-clip-text text-transparent
+        bg-gradient-to-r from-cyan-400 via-pink-500 to-purple-600
+        drop-shadow-lg;
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: #1f2937; /* dark background for accordion body */
+      border-top: 1px solid #4b5563;
+    }
+    .accordion-content.open {
+      max-height: 1000px;
+      transition: max-height 0.5s ease-in;
+    }
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #10b981;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    .hidden {
+      display: none;
+    }
+    .progress-wave {
+      background-color: #d1d5db;
+      position: relative;
+      height: 0.5rem;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background-color: #10b981;
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    /* ==== Removed all “dark:” overrides for text/color to prevent forced switching ==== */
+  </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <!-- MathJax setup (unchanged) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]],
+        processEscapes: true,
+      },
+      svg: { fontCache: "global" },
+      options: {
+        skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+        ignoreHtmlClass: "tex2jax_ignore",
+        processHtmlClass: "tex2jax_process",
+      },
+    };
+  </script>
+</head>
+
+<body class="text-gray-100 min-h-screen flex flex-col">
+  <!-- Global VANTA Globe Background -->
+  <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
+
+  <!-- **** HERO SECTION **** -->
+  <section
+    id="hero"
+    class="relative h-[60vh] md:h-screen flex items-center justify-center overflow-hidden"
+  >
+    <!-- Hero copy -->
+    <div class="px-6 text-center max-w-5xl mx-auto">
+      <h1 class="gradient-title text-5xl md:text-7xl font-extrabold tracking-tight text-white">
+        Alef Math Content Decoder
+      </h1>
+      <p class="mt-6 text-lg md:text-2xl text-white">
+        AI-powered visual analysis that turns any math content into engaging,
+        auto-generated practice questions.
+      </p>
+      <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="#generation-form"
+          class="px-8 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 font-semibold text-white shadow-lg hover:scale-105 transition-transform"
+          >Try Demo</a
+        >
+        <a
+          href="#"
+          class="px-8 py-3 rounded-full border border-white/20 backdrop-blur font-semibold text-white hover:bg-white/10 transition"
+        >
+          <i class="fa-solid fa-play mr-2"></i>Watch Showreel
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- **** MAIN APPLICATION CARD **** -->
+  <main class="flex-1 flex items-center justify-center p-4">
+    <!-- Set background to transparent -->
+    <div class="rounded-2xl shadow-xl p-8 md:p-12 w-full max-w-7xl bg-transparent">
+      <!-- ======= HEADER INSIDE CARD ======= -->
+      <header class="text-center mb-10">
+        <div
+          class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-white text-3xl font-bold mb-4 shadow-md"
+        >
+          <img src="./static/image_alef.png" alt="Logo" class="w-12 h-10 object-contain" />
+        </div>
+        <!-- Make header text light-colored -->
+        <h1 class="text-3xl md:text-4xl font-bold text-white">
+          Alef Math Content Decoder
+        </h1>
+        <p class="text-white mt-2 text-lg">
+          Analyze visuals, extract knowledge, and auto-generate smart math
+          questions.
+        </p>
+      </header>
+
+      <!-- ======= FORM WITH INPUT & OUTPUT ======= -->
+      <form
+        id="generation-form"
+        class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
+      >
+        <!-- INPUT SECTION -->
+        <section>
+          <!-- 1. Choose Input Type -->
+          <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-200 mb-3">
+              Choose Input Type:
+            </h2>
+            <div class="flex flex-wrap gap-4">
+              <label
+                class="flex items-center space-x-2 cursor-pointer p-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition duration-200"
+              >
+                <input
+                  type="radio"
+                  name="inputType"
+                  value="image"
+                  class="form-radio text-green-500 focus:ring-green-500"
+                  checked
+                />
+                <span class="text-xl">📷</span>
+                <span class="text-gray-200">Upload Image</span>
+              </label>
+              <label
+                class="flex items-center space-x-2 cursor-pointer p-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition duration-200"
+              >
+                <input
+                  type="radio"
+                  name="inputType"
+                  value="text"
+                  class="form-radio text-green-500 focus:ring-green-500"
+                />
+                <span class="text-xl">🖊️</span>
+                <span class="text-gray-200">Paste Text</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Drag & Drop Container -->
+          <div
+            id="upload-area"
+            class="mb-6 relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-green-500 transition duration-200 cursor-pointer"
+          >
+            <input
+              type="file"
+              id="file-upload"
+              name="file"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              accept=".jpg, .jpeg, .png"
+            />
+            <div
+              id="upload-instructions"
+              class="flex flex-col items-center justify-center space-y-3"
+            >
+              <span class="lucide text-gray-400 text-4xl">upload</span>
+              <p class="text-gray-600">Drag and drop file here</p>
+              <p class="text-sm text-gray-500">or</p>
+              <button
+                type="button"
+                class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition duration-200"
+                onclick="document.getElementById('file-upload').click();"
+              >
+                Browse files
+              </button>
+              <p id="file-types-text" class="text-xs text-gray-500 mt-2">
+                Limit 200MB per file. JPG, JPEG, PNG
+              </p>
+            </div>
+            <div id="file-preview" class="hidden relative">
+              <img
+                id="image-preview-element"
+                src="#"
+                alt="Image Preview"
+                class="rounded-lg max-h-48 w-auto mx-auto shadow-sm"
+                style="display: none"
+              />
+              <button
+                type="button"
+                id="remove-file"
+                class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition duration-200"
+              >
+                <span class="lucide text-lg">x</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Text Input (hidden by default) -->
+          <div id="text-area" class="mb-6 hidden">
+            <textarea
+              name="text_input"
+              id="text-input-field"
+              rows="8"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-200 bg-gray-600 text-gray-900"
+              placeholder="Paste your math problem or content here..."
+            ></textarea>
+          </div>
+
+          <!-- 3. Number of Questions -->
+          <div class="mb-6">
+            <label
+              for="num-questions"
+              class="block text-lg font-semibold text-gray-200 mb-3"
+            >
+              Number of Questions:
+            </label>
+            <div class="flex items-center space-x-3">
+              <button
+                type="button"
+                id="decrease-questions"
+                class="p-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 transition duration-200"
+              >
+                <span class="lucide">-</span>
+              </button>
+              <input
+                type="number"
+                id="num-questions"
+                name="num_questions"
+                value="1"
+                min="1"
+                max="10"
+                class="w-16 text-center border border-gray-300 rounded-lg p-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 text-gray-900"
+              />
+              <button
+                type="button"
+                id="increase-questions"
+                class="p-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 transition duration-200"
+              >
+                <span class="lucide">+</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Generate Button -->
+          <button
+            type="submit"
+            id="generate-button"
+            class="w-full py-3 px-6 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span class="lucide button-icon">⚡️</span>
+            <span class="button-text">Generate Questions</span>
+            <div class="loader hidden ml-2"></div>
+          </button>
+          <p id="error-message" class="text-red-500 text-sm mt-3 hidden"></p>
+
+          <!-- ========================== -->
+          <!-- Example Images Section -->
+          <!-- ========================== -->
+          <div id="example-images" class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-200 mb-2">Example Images:</h3>
+            <div class="flex flex-wrap gap-4">
+              {% for img in example_images %}
+              <img
+                src="{{ url_for('static', filename='examples/' ~ img) }}"
+                alt="{{ img }}"
+                class="w-24 h-24 object-cover cursor-pointer border border-gray-300 rounded-lg example-image-thumbnail"
+                data-filename="{{ img }}"
+              />
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+        <!-- OUTPUT SECTION -->
+        <section class="p-6 rounded-xl border border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-400 mb-6 text-center md:text-left">
+            Generated Questions
+          </h2>
+          <div id="output-area" class="space-y-4">
+            <p id="output-placeholder" class="text-center text-gray-500 mt-6">
+              Output will appear here after generation.
+            </p>
+          </div>
+        </section>
+      </form>
+    </div>
+  </main>
+
+  <!-- **** MAIN JAVASCRIPT (PDF-related code removed, optimized) **** -->
+  <script>
+    // --- DOM Element References ---
+    const form = document.getElementById("generation-form");
+    const inputTypeRadios = document.querySelectorAll('input[name="inputType"]');
+    const uploadArea = document.getElementById("upload-area");
+    const uploadInstructions = document.getElementById("upload-instructions");
+    const fileUploadInput = document.getElementById("file-upload");
+    const filePreview = document.getElementById("file-preview");
+    let imagePreviewElement = document.getElementById("image-preview-element");
+    let removeFileButton = document.getElementById("remove-file");
+    const textArea = document.getElementById("text-area");
+    const textInputField = document.getElementById("text-input-field");
+    const numQuestionsInput = document.getElementById("num-questions");
+    const decreaseBtn = document.getElementById("decrease-questions");
+    const increaseBtn = document.getElementById("increase-questions");
+    const generateButton = document.getElementById("generate-button");
+    const buttonIcon = generateButton.querySelector(".button-icon");
+    const buttonText = generateButton.querySelector(".button-text");
+    const loader = generateButton.querySelector(".loader");
+    const outputArea = document.getElementById("output-area");
+    const outputPlaceholder = document.getElementById("output-placeholder");
+    const errorMessage = document.getElementById("error-message");
+
+    // --- Input Type Toggle (only image/text) ---
+    inputTypeRadios.forEach((radio) => {
+      radio.addEventListener("change", function () {
+        errorMessage.classList.add("hidden");
+        if (this.value === "image") {
+          uploadArea.classList.remove("hidden");
+          textArea.classList.add("hidden");
+          textInputField.value = "";
+          uploadInstructions.querySelector("p").textContent = "Drag and drop file here";
+          document.getElementById("file-types-text").textContent =
+            "Limit 200MB per file. JPG, JPEG, PNG";
+          fileUploadInput.setAttribute("accept", ".jpg, .jpeg, .png");
+          resetFileUpload();
+        } else if (this.value === "text") {
+          uploadArea.classList.add("hidden");
+          textArea.classList.remove("hidden");
+          resetFileUpload();
+        }
+      });
+    });
+
+    // --- File Handling (images only) ---
+    fileUploadInput.addEventListener("change", handleFileSelect);
+
+    // Drag and drop events
+    uploadArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadArea.classList.add("border-green-500", "bg-green-50");
+    });
+
+    uploadArea.addEventListener("dragleave", () => {
+      uploadArea.classList.remove("border-green-500", "bg-green-50");
+    });
+
+    uploadArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove("border-green-500", "bg-green-50");
+      if (e.dataTransfer.files.length) {
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile.type.startsWith("image/")) {
+          fileUploadInput.files = e.dataTransfer.files;
+          handleFileSelect();
+        } else {
+          showError("Invalid file type. Please drop a JPG, JPEG, or PNG file.");
+          resetFileUpload();
+        }
+      }
+    });
+
+    function handleFileSelect() {
+      errorMessage.classList.add("hidden");
+      const file = fileUploadInput.files[0];
+      if (file && file.type.startsWith("image/")) {
+        uploadInstructions.classList.add("hidden");
+        filePreview.classList.remove("hidden");
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreviewElement.src = e.target.result;
+          imagePreviewElement.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        if (file) {
+          showError("Invalid file type. Please select a JPG, JPEG, or PNG file.");
+        }
+        resetFileUpload();
+      }
+    }
+
+    function resetFileUpload() {
+      fileUploadInput.value = "";
+      uploadInstructions.classList.remove("hidden");
+      filePreview.classList.add("hidden");
+      filePreview.innerHTML = `
+        <img id="image-preview-element" src="#" alt="Image Preview" class="rounded-lg max-h-48 w-auto mx-auto shadow-sm" style="display:none"/>
+        <button type="button" id="remove-file" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition duration-200">
+          <span class="lucide text-lg">❎</span>
+        </button>
+      `;
+      imagePreviewElement = document.getElementById("image-preview-element");
+      removeFileButton = document.getElementById("remove-file");
+    }
+
+    uploadArea.addEventListener("click", function (e) {
+      if (e.target.closest("#remove-file")) {
+        resetFileUpload();
+      }
+    });
+
+    // --- Number of Questions Controls ---
+    decreaseBtn.addEventListener("click", () => {
+      let currentValue = parseInt(numQuestionsInput.value);
+      if (currentValue > parseInt(numQuestionsInput.min)) {
+        numQuestionsInput.value = currentValue - 1;
+      }
+    });
+
+    increaseBtn.addEventListener("click", () => {
+      let currentValue = parseInt(numQuestionsInput.value);
+      if (currentValue < parseInt(numQuestionsInput.max)) {
+        numQuestionsInput.value = currentValue + 1;
+      }
+    });
+
+    // --- Form Submission & Global Progress ---
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      showLoading(true);
+      errorMessage.classList.add("hidden");
+      outputArea.innerHTML = "";
+      outputPlaceholder.classList.add("hidden");
+
+      // Create and show global progress bar
+      const globalProgress = document.createElement("div");
+      globalProgress.id = "global-progress";
+      globalProgress.className = "mb-4";
+      globalProgress.innerHTML = `
+        <p class="progress-status text-sm text-gray-200 mb-2">Status: </p>
+        <div class="progress-wave">
+          <div class="progress-bar"></div>
+        </div>
+      `;
+      outputArea.appendChild(globalProgress);
+      const progressBar = globalProgress.querySelector(".progress-bar");
+      const progressStatus = globalProgress.querySelector(".progress-status");
+
+      // Initial progress updates
+      progressBar.style.width = "20%";
+      progressStatus.textContent = "🚀 Start";
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      progressBar.style.width = "40%";
+      progressStatus.textContent = "🔍 Analyzing";
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      progressBar.style.width = "60%";
+      progressStatus.textContent = "⚙️ Processing";
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Validate inputs
+      const formData = new FormData(form);
+      const selectedType = formData.get("inputType");
+      if (selectedType === "image") {
+        if (!fileUploadInput.files[0]) {
+          showError("Please select an image file to upload.");
+          globalProgress.remove();
+          showLoading(false);
+          return;
+        }
+        if (!fileUploadInput.files[0].type.startsWith("image/")) {
+          showError("Invalid file type selected. Expected JPG, JPEG, or PNG.");
+          globalProgress.remove();
+          showLoading(false);
+          return;
+        }
+        if (formData.has("text_input")) {
+          formData.delete("text_input");
+        }
+      } else if (selectedType === "text") {
+        if (!formData.get("text_input")?.trim()) {
+          showError("Please paste some text.");
+          globalProgress.remove();
+          showLoading(false);
+          return;
+        }
+      } else {
+        showError("Invalid input type specified.");
+        globalProgress.remove();
+        showLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("/generate", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP error! Status: ${response.status}`);
+        }
+        // Continue progress updates
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        progressBar.style.width = "80%";
+        progressStatus.textContent = "✍️ Crafting";
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        progressBar.style.width = "100%";
+        progressStatus.textContent = "✅ Done";
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        globalProgress.remove();
+
+        outputArea.innerHTML = "";
+        if (data.results && data.results.length > 0) {
+          data.results.forEach((result, index) => {
+            if (result.error) {
+              createErrorOutput(index + 1, result.error);
+            } else {
+              createOutputAccordion(index + 1, result.html, result.metadata);
+            }
+          });
+          if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+          } else {
+            console.warn("MathJax not ready for typesetting.");
+          }
+        } else if (data.results && data.results.length === 0) {
+          outputPlaceholder.textContent =
+            "Generation completed, but no questions were returned.";
+          outputPlaceholder.classList.remove("hidden");
+          outputArea.appendChild(outputPlaceholder);
+        } else {
+          throw new Error(data.error || "Received an unexpected response format.");
+        }
+      } catch (error) {
+        console.error("Generation Error:", error);
+        showError(`Generation failed: ${error.message}`);
+        outputArea.innerHTML = "";
+        outputPlaceholder.textContent = "An error occurred during generation.";
+        outputPlaceholder.classList.remove("hidden");
+        outputArea.appendChild(outputPlaceholder);
+      } finally {
+        showLoading(false);
+      }
+    });
+
+    function showLoading(isLoading) {
+      if (isLoading) {
+        generateButton.disabled = true;
+        buttonIcon.classList.add("hidden");
+        buttonText.classList.add("hidden");
+        loader.classList.remove("hidden");
+      } else {
+        generateButton.disabled = false;
+        buttonIcon.classList.remove("hidden");
+        buttonText.classList.remove("hidden");
+        loader.classList.add("hidden");
+      }
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.remove("hidden");
+    }
+
+    // --- Output Accordion Helpers ---
+    function createOutputAccordion(index, htmlContent, metadata) {
+      // We expect `htmlContent` to include both the HTML block and maybe a ```json ... ``` block.
+      // First: extract the JSON metadata out of the returned string. Fallback to provided `metadata`.
+      function extractJsonMetadata(markdownString) {
+        const regex = /```(?:json)?\s*([\s\S]*?)\s*```/i;
+        const match = markdownString.match(regex);
+        if (!match) return null;
+        try {
+          return JSON.parse(match[1].trim());
+        } catch (err) {
+          console.error("Invalid JSON:", err);
+          return null;
+        }
+      }
+
+      // Second: extract whatever was inside ```html ... ``` if present, else take the raw `htmlContent`.
+      function extractHtmlContent(markdownString) {
+        const regex = /```(?:html)?\s*([\s\S]*?)\s*```/i;
+        const match = markdownString.match(regex);
+        return match ? match[1].trim() : markdownString;
+      }
+
+      const extractedMetadata = extractJsonMetadata(htmlContent) || metadata;
+      const htmlContentExtracted = extractHtmlContent(htmlContent) || htmlContent;
+
+      // Build the accordion wrapper
+      const container = document.createElement("div");
+      container.className =
+        "border border-gray-300 rounded-lg overflow-hidden bg-gray-500 shadow-sm";
+
+      container.innerHTML = `
+        <button type="button"
+                class="accordion-toggle flex justify-between items-center w-full p-4 text-left font-medium text-gray-200 hover:bg-gray-50 transition duration-200">
+          <span class="truncate pr-2">Output ${index}</span>
+          <span class="lucide accordion-icon transition-transform duration-300 flex-shrink-0">🪭</span>
+        </button>
+        <div class="accordion-content bg-cyan-50 px-4 pb-4">
+          <!-- We’ll inject returned HTML (including any D3 scripts) into this div -->
+          <div class="content-area max-w-none" style="color: initial; font-family: initial;"></div>
+          <details class="mt-3 text-xs text-gray-500">
+            <summary class="cursor-pointer">View Raw Metadata</summary>
+            <pre class="mt-1 p-2 bg-gray-100 rounded text-xs overflow-x-auto">
+${JSON.stringify(extractedMetadata, null, 2)}
+            </pre>
+          </details>
+        </div>
+      `;
+
+      // Accordion toggle behavior
+      const toggleButton = container.querySelector(".accordion-toggle");
+      toggleButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        const content = this.nextElementSibling;
+        const icon = this.querySelector(".accordion-icon");
+        content.classList.toggle("open");
+        icon.classList.toggle("rotate-180");
+      });
+
+      // Now: take `htmlContentExtracted`, parse out any <script> tags, insert non-script HTML first,
+      // then re-create each <script> so that it actually runs (e.g. loads D3).
+      const contentArea = container.querySelector(".content-area");
+      // Create a temporary container to parse
+      const temp = document.createElement("div");
+      temp.innerHTML = htmlContentExtracted;
+
+      // 1) Move over all non-script nodes:
+      Array.from(temp.childNodes).forEach((child) => {
+        if (!(child.tagName && child.tagName.toLowerCase() === "script")) {
+          contentArea.appendChild(child.cloneNode(true));
+        }
+      });
+
+      // 2) For each <script> in the temp, recreate and append it so it executes:
+      Array.from(temp.querySelectorAll("script")).forEach((oldScript) => {
+        const newScript = document.createElement("script");
+        // If it has a src, copy it over:
+        if (oldScript.src) {
+          newScript.src = oldScript.src;
+          // Copy attributes (type, async, etc.)
+          Array.from(oldScript.attributes).forEach((attr) => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          contentArea.appendChild(newScript);
+        } else {
+          // Inline script: copy its text content
+          newScript.textContent = oldScript.textContent;
+          contentArea.appendChild(newScript);
+        }
+      });
+
+      // Finally, append this whole accordion to the output area
+      outputArea.appendChild(container);
+    }
+
+    function createErrorOutput(index, error) {
+      const div = document.createElement("div");
+      div.className =
+        "border border-red-300 rounded-lg overflow-hidden bg-white shadow-sm";
+      div.innerHTML = `
+        <button type="button" class="flex justify-between items-center w-full p-4 text-left font-medium text-red-600 hover:bg-red-50 transition duration-200">
+          <span class="truncate pr-2">Error in Output ${index}</span>
+          <span class="lucide">x</span>
+        </button>
+        <div class="p-4 bg-white">
+          <p class="text-red-500">${error}</p>
+        </div>
+      `;
+      outputArea.appendChild(div);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Trigger the correct inputType view
+      document.querySelector('input[name="inputType"]:checked').dispatchEvent(new Event("change"));
+      outputPlaceholder.classList.remove("hidden");
+      outputArea.innerHTML = "";
+      outputArea.appendChild(outputPlaceholder);
+
+      // ==========================
+      // Example-Image Click Logic
+      // ==========================
+      document.querySelectorAll('.example-image-thumbnail').forEach(imgEl => {
+        imgEl.addEventListener('click', async () => {
+          // Hide any previous error
+          errorMessage.classList.add("hidden");
+          // Switch to "Upload Image" mode if needed
+          document.querySelector('input[name="inputType"][value="image"]').checked = true;
+          uploadArea.classList.remove("hidden");
+          textArea.classList.add("hidden");
+          resetFileUpload();
+
+          // Fetch the image from /static/examples/..., convert to a File, insert into <input type="file">
+          const imgSrc = imgEl.src;
+          try {
+            const response = await fetch(imgSrc);
+            const blob = await response.blob();
+            const fileName = imgEl.getAttribute('data-filename');
+            const file = new File([blob], fileName, { type: blob.type });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileUploadInput.files = dataTransfer.files;
+            handleFileSelect();
+          } catch (err) {
+            console.error("Failed to load example image:", err);
+            showError("Failed to load example image.");
+          }
+        });
+      });
+    });
+  </script>
+
+  <!-- **** VANTA.GLOBE INITIALIZATION (covers entire background) **** -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.VANTA && document.getElementById("vanta-globe")) {
+        VANTA.GLOBE({
+          el: "#vanta-globe",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.0,
+          minWidth: 200.0,
+          scale: 1.0,
+          scaleMobile: 1.0,
+          color: 0x00bcd4,
+          color2: 0xff2d95,
+          backgroundColor: 0x0b1121,
+        });
+      }
+    });
+  </script>
+</body>
+</html>
