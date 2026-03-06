@@ -118,4 +118,7 @@ def allowed_file(filename, input_type):
 # --- Run Application ---
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Use the port provided by the hosting environment (e.g., Azure),
+    # falling back to 8000 if not set.
+    port = int(os.environ.get("PORT", os.environ.get("WEBSITES_PORT", 8000)))
+    app.run(host='0.0.0.0', port=port)
