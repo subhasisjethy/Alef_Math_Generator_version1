@@ -26,7 +26,7 @@ load_dotenv()
 # Adjust the OpenAI client instantiation as needed for your OpenAI library version.
 openai_client = OpenAIChat(api_key=os.getenv("OPENAI_API_KEY"), id='gpt-4o-mini') #, reasoning_effort='low')
 # openai_client = OpenAILike(api_key='lm', id='o4-mini', base_url='http://localhost:1234/v1')
-anthropic_client = Claude(api_key=os.getenv("ANTHROPIC_API_KEY"), id='claude-3-7-sonnet-latest')# id= 'claude-sonnet-4-20250514') #id='claude-3-5-sonnet-latest') #'claude-sonnet-4-20250514')#
+anthropic_client = Claude(api_key=os.getenv("ANTHROPIC_API_KEY"), id='claude-sonnet-4-6')# id= 'claude-sonnet-4-20250514') #id='claude-3-5-sonnet-latest') #'claude-sonnet-4-20250514')#
 
 
 def extract_html_from_string(text):
